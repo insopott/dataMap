@@ -2,6 +2,7 @@
 
 @section('content')
     <div class="container">
+        @include('messages')
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <table class="table table-striped table-responsive">
@@ -12,6 +13,7 @@
                             <td>email</td>
                             <td>Name</td>
                             <td>&nbsp;</td>
+                            <td>&nbsp;</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -21,7 +23,15 @@
                                 <td>{{$a->town->name}}</td>
                                 <td>{{$a->email}}</td>
                                 <td>{{$a->name}}</td>
-                                <td>&nbsp;</td>
+                                <td>
+                                    <a class="btn btn-primary"  href="{{route('users.edit',$a->id)}}">Edit</a>&nbsp;
+
+                                </td>
+                                <td>
+                                    {{Form::open(array('url'=>route('users.destroy',$a->id),'method'=>'DELETE'))}}
+                                        <button type="submit" class="btn btn-warning">Delete</button>
+                                    {{Form::close()}}
+                                </td>
                             </tr>
                        @empty
                            <tr>

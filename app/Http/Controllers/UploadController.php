@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Images;
+use App\Towns;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UploadController extends Controller
 {
@@ -13,8 +17,8 @@ class UploadController extends Controller
      */
     public function __construct()
     {
-        ini_set("upload_max_filesize", "400M");
-        ini_set("post_max_size","1000M");
+        //ini_set("upload_max_filesize", "400M");
+        //ini_set("post_max_size","1000M");
         $this->middleware('auth');
     }
 
@@ -23,6 +27,7 @@ class UploadController extends Controller
         //
         ini_set("upload_max_filesize", "400M");
         ini_set("post_max_size","1000M");
+        //die(ini_get('upload_tmp_dir') ? ini_get('upload_tmp_dir') : sys_get_temp_dir());
         return view('uploads.index');
     }
 
@@ -45,13 +50,28 @@ class UploadController extends Controller
     public function store(Request $request)
     {
         //
-        //ini_set("upload_max_filesize", "400M");
-        //ini_set("post_max_size","1000M");
+        ini_set("upload_max_filesize", "400M");
+        ini_set("post_max_size","1000M");
         //return $request->all();
-        if($request->has('photos')){
-            return $request->photos;
-        }else return 'none';
-        return back();
+        $town=Towns::whereId($request->town_id)->first();
+        if($town->images)
+            $town->images()->delete();
+        Validator::make($request->all(), [
+            'file' => ' required | max:1000'
+        ])->validate();
+        if($request->hasFile('file')){
+         //   return 'yes';
+            foreach ($request->file('file') as $f){
+                $img=new Images();
+                $img->slug=str_slug(str_random(20));
+                $img->path=$f->store('images');
+                $img->town_id=$request->town_id;
+                $img->save();
+
+            }
+           return back();
+        }else return back()->withInput($request->all())->with('messages','Something Went Wrong');
+        return back()->with('messages','Successfully Uploaded');
     }
 
     /**

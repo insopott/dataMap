@@ -17,6 +17,8 @@ class CreateTownsTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('slug');
+            $table->double('lat')->default(0);
+            $table->double('long')->dafault(0);
             $table->timestamps();
         });
     }

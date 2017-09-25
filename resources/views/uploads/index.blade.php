@@ -8,8 +8,10 @@
                     <div class="panel-heading">Dashboard</div>
 
                     <div class="panel-body">
-                       <form url="{{route('admin.store')}}" method="post" files="true" enctype="multipart/form-data">
-                           {{csrf_field()}}
+                        @include('messages')
+                      {!! Form::open(array('url'=>route('admin.store'),'methdo'=>'POST','files' => true,
+                       'enctype'=>"multipart/form-data")) !!}
+
                            @if(Auth::user()->town_id==null)
                                 @include('town')
                            @else
@@ -19,14 +21,14 @@
                             <br>
                             <br>
                            <div class="row">
-                               <label for="photos" class="col-md-4 control-label">Upload Files</label>
+                               <label for="file[]" class="col-md-4 control-label">Upload Files</label>
 
                                <div class="col-md-6">
-                                   <input type="file" name="photos"  class="form-control">
+                                   {{Form::file('file[]',array('class'=>'form-control','multiple'))}}
 
-                                   @if ($errors->has('photos'))
+                                   @if ($errors->has('file'))
                                        <span class="help-block">
-                                                <strong>{{ $errors->first('photos[]') }}</strong>
+                                                <strong>{{ $errors->first('file') }}</strong>
                                        </span>
                                    @endif
                                </div>
@@ -38,7 +40,7 @@
                                </div>
                            </div>
 
-                       </form>
+                     {{Form::close()}}
                     </div>
                 </div>
             </div>

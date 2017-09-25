@@ -52,7 +52,7 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
-        ]);
+        ])->validate();
     }
 
     /**
@@ -72,6 +72,7 @@ class RegisterController extends Controller
 
     }
     public function register(Request $request){
+        $this->validator($request->all());
         $this->create($request->all());
         return redirect()->route('users.index');
     }
