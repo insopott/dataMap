@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Images extends Model
 {
     //
-    protected $fillable=['path','slug','town_id'];
+    protected $fillable=['path','slug','town_id','type','description'];
 
 }

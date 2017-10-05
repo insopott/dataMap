@@ -41,19 +41,40 @@
                     </div>
                     <div class="modal-body">
                         @if($t->images->count())
-                            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
-
-                                <!-- Wrapper for slides -->
-                                <div class="carousel-inner" role="listbox">
+                            <!-- Nav tabs -->
+                            <div>
+                                <ul class="nav nav-tabs" role="tablist">
                                     @foreach($t->images as $image)
-                                        <div class="item active">
-                                            <img src="{{asset($image->path)}}" alt="...">
+                                        <li role="presentation" class="{{$loop->index==0?'active':''}}" >
+                                            <a href="#{{$t->slug.''.$image->id}}" aria-controls="home" role="tab" data-toggle="tab">
+                                                {{$image->description}}
+                                            </a>
+                                        </li>
+                                        <script>
+                                            $('{{$t->slug.''.$image->id}} a').click(function (e) {
+                                                e.preventDefault()
+                                                alert('yes');
+                                                $(this).tab('show')
+                                            })
+                                        </script>
+                                    @endforeach
+                                </ul>
+
+                                <div class="tab-content">
+                                    @foreach($t->images as $image)
+                                        <div role="tabpanel" class="tab-pane active" id="{{$t->slug.''.$image->id}}">
+                                            <div class="row">
+                                                <div class="col-md-12 col-sm-12 col-lg-12">
+                                                    <img class="image-responsive" src="{{$image->path}}" style="width: inherit">
+                                                </div>
+                                            </div>
+
                                         </div>
                                     @endforeach
 
                                 </div>
-                            </div>
 
+                            </div>
                          @else
                             <span>No Images</span>
                         @endif
