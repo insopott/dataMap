@@ -16,6 +16,7 @@ class UploadController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public $types=array('1'=>'Earthquake Hazard','2'=>'Flood Hazard','3'=>'Rain-Induced Hazard','4'=>'Tusnami Hazard');
     public function __construct()
     {
         //ini_set("upload_max_filesize", "400M");
@@ -26,10 +27,11 @@ class UploadController extends Controller
     public function index()
     {
         //
+        $types=$this->types;
         ini_set("upload_max_filesize", "400M");
         ini_set("post_max_size","1000M");
         //die(ini_get('upload_tmp_dir') ? ini_get('upload_tmp_dir') : sys_get_temp_dir());
-        return view('uploads.index');
+        return view('uploads.index',compact('types'));
     }
 
     /**
@@ -59,10 +61,8 @@ class UploadController extends Controller
 
         Validator::make($request->all(), [
             'town_id'=>'required',
-            'earth' => 'max:10000',
-            'flood' => 'max:10000',
-            'rain' => 'max:10000',
-            'tsu' => 'max:10000',
+            'file' => 'required|max:10000',
+
         ],[
            // 'earth.required'=>'Select Image for Earthquake hazard',
             'earth.max'=>'Earthquake hazard image too large',
@@ -80,76 +80,23 @@ class UploadController extends Controller
         try{
             DB::beginTransaction();
                 //for earth
-                if($request->hasFile('earth')){
-                    $earth=Images::where('town_id',$id)->where('type',1);
+                if($request->hasFile('file')){
+                    $earth=Images::where('town_id',$id)->where('type',$request->type);
                     if($earth->count()){
                         $earth=$earth->first();
-                        $earth->path=$request->file('earth')->store('images');
+                        $earth->path=$request->file('file')->store('images');
                         $earth->save();
                     }else{
                         $earth=new Images();
                         $earth->slug=str_slug(str_random(20));
-                        $earth->type=1;
-                        $earth->description='Earthquake Hazard';
-                        $earth->path=$request->file('earth')->store('images');
+                        $earth->type=$request->type;
+                        $earth->description=$this->types[$request->type];
+                        $earth->path=$request->file('file')->store('images');
                         $earth->town_id=$id;
                         $earth->save();
                     }
                 }//end for request earth;
 
-                //for flood
-                if($request->hasFile('flood')){
-                    $flood=Images::where('town_id',$id)->where('type',2);
-                    if($flood->count()){
-                        $flood=$earth->first();
-                        $flood->path=$request->file('flood')->store('images');
-                        $flood->save();
-                    }else{
-                        $flood=new Images();
-                        $flood->slug=str_slug(str_random(20));
-                        $flood->type=2;
-                        $flood->description='Flood Hazard';
-                        $flood->path=$request->file('flood')->store('images');
-                        $flood->town_id=$id;
-                        $flood->save();
-                    }
-                }//end for request flood;
-
-                //for rain
-                if($request->hasFile('rain')){
-                    $rain=Images::where('town_id',$id)->where('type',3);
-                    if($rain->count()){
-                        $rain=$earth->first();
-                        $rain->path=$request->file('rain')->store('images');
-                        $rain->save();
-                    }else{
-                        $rain=new Images();
-                        $rain->slug=str_slug(str_random(20));
-                        $rain->type=3;
-                        $rain->description='Rain-induced Hazard';
-                        $rain->path=$request->file('rain')->store('images');
-                        $rain->town_id=$id;
-                        $rain->save();
-                    }
-                }//end for request rain;
-
-                //for tsunami
-                if($request->hasFile('tsu')){
-                    $tsu=Images::where('town_id',$id)->where('type',4);
-                    if($tsu->count()){
-                        $tsu=$earth->first();
-                        $tsu->path=$request->file('tsu')->store('images');
-                        $tsu->save();
-                    }else{
-                        $tsu=new Images();
-                        $tsu->slug=str_slug(str_random(20));
-                        $tsu->type=4;
-                        $tsu->description='Tsunami Hazard';
-                        $tsu->path=$request->file('tsu')->store('images');
-                        $tsu->town_id=$id;
-                        $tsu->save();
-                    }
-                }//end for request rain;
 
 
             DB::commit();
@@ -157,6 +104,7 @@ class UploadController extends Controller
             DB::rollback();
             return back()->with('messages','Something Went Wrong');
         }
+
         /*if($request->hasFile('file')){
          //   return 'yes';
             foreach ($request->file('file') as $f){
